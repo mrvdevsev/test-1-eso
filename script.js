@@ -124,12 +124,21 @@ btnComenzar.addEventListener('click', async function() {
   const temaElegido = selectTema.value;
 
   // 1. Validaciones
+  const msgError = document.getElementById('msg-error-config');
+  if (msgError) msgError.classList.add('id-oculto');
+
   if (!asignaturaElegida) {
-    alert('Por favor, selecciona una asignatura.');
+    if (msgError) {
+      msgError.textContent = '⚠️ Por favor, selecciona una asignatura.';
+      msgError.classList.remove('id-oculto');
+    }
     return;
   }
   if (!temaElegido) {
-    alert('Por favor, selecciona un tema.');
+    if (msgError) {
+      msgError.textContent = '⚠️ Por favor, selecciona un tema.';
+      msgError.classList.remove('id-oculto');
+    }
     return;
   }
 
@@ -153,7 +162,10 @@ btnComenzar.addEventListener('click', async function() {
 
   if (error || !preguntas || preguntas.length === 0) {
     console.error('Error al cargar preguntas:', error);
-    alert('No se encontraron preguntas para la selección indicada.');
+    if (msgError) {
+      msgError.textContent = '⚠️ No se encontraron preguntas para la selección indicada.';
+      msgError.classList.remove('id-oculto');
+    }
     return;
   }
 
@@ -267,6 +279,14 @@ function verificarRespuestaUsuario(indiceSeleccionado) {
     const preguntaActual = preguntasFiltradas[indicePreguntaActual];
     const divFeedback = document.getElementById('feedback');
     const btnSiguiente = document.getElementById('btn-siguiente');
+    // Preparamos el bloque explicativo si la pregunta tiene explicación
+    let infoExplicacion = '';
+    if (preguntaActual.explicacion) {
+        infoExplicacion = `<div class="caja-explicacion">
+            <p><strong>💡 Explicación:</strong> ${preguntaActual.explicacion}</p>
+            ${preguntaActual.pagina ? `<p class="texto-pagina">📖 Página del libro: ${preguntaActual.pagina}</p>` : ''}
+        </div>`;
+    }
     
     // Bloqueamos los 4 botones para que el usuario no pueda cambiar de opinión
     const botonesOpciones = document.querySelectorAll('.btn-opcion');
@@ -279,7 +299,7 @@ function verificarRespuestaUsuario(indiceSeleccionado) {
 
     // Comparamos el número del botón clicado con el del campo "Correcta" de tu Excel
     if (indiceSeleccionado === indiceCorrecto) {
-        divFeedback.innerHTML = "<p class='mensaje-acierto'>¡Correcto! Sigue así.</p>";
+        divFeedback.innerHTML = "<p class='mensaje-acierto'>¡Correcto! Sigue así.</p>" + infoExplicacion;
         botonesOpciones[indiceSeleccionado].classList.add('opcion-correcta'); // Se vuelve verde
         
         // Guardamos que ha acertado en el historial
@@ -289,7 +309,7 @@ function verificarRespuestaUsuario(indiceSeleccionado) {
             seleccionada: indiceSeleccionado
         };
     } else {
-        divFeedback.innerHTML = "<p class='mensaje-fallo'>¡Has fallado!</p>";
+        divFeedback.innerHTML = "<p class='mensaje-fallo'>¡Has fallado!</p>" + infoExplicacion;
         botonesOpciones[indiceSeleccionado].classList.add('opcion-erronea'); // El suyo se vuelve rojo
         botonesOpciones[indiceCorrecto].classList.add('opcion-correcta'); // La solución se vuelve verde
         

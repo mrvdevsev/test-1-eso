@@ -349,3 +349,24 @@ h2, h3 {
 #txt-aciertos { color: var(--color-acierto); font-weight: 700; font-size: 1.1rem; }
 #txt-fallos { color: var(--color-fallo); font-weight: 700; font-size: 1.1rem; }
 #txt-blancos { color: #718096; font-weight: 700; font-size: 1.1rem; }
+
+.caja-explicacion {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background-color: #f1f5f9;
+    border-left: 4px solid #0284c7;
+    border-radius: 6px;
+    text-align: left;
+    font-size: 0.95rem;
+    color: #334155;
+    line-height: 1.4;
+}
+
+.caja-explicacion p {
+    margin: 4px 0;
+}
+
+.texto-pagina {
+    font-weight: 600;
+    color: #0369a1;
+}
