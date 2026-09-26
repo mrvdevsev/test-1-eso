@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test 1º ESO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="contenedor-app">
+        <h1>Test 1º ESO</h1>
+
+        <div id="pantalla-config">
+            <h2>Configura tu entrenamiento</h2>
+
+            <div class="grupo-control">
+                <label for="select-asignatura">Asignatura:</label>
+                <select id="select-asignatura">
+                    <option value="">Cargando asignaturas...</option>
+                </select>
+            </div>
+
+            <div class="grupo-control" id="grupo-tema">
+                <label for="select-tema">Tema:</label>
+                <select id="select-tema">
+                    <option value="">Selecciona una asignatura primero</option>
+                </select>
+            </div>
+
+            <button id="btn-comenzar" class="btn-principal">Comenzar Test</button>
+        </div>
+
+        <div id="pantalla-test" class="id-oculto">
+            <div class="cabecera-test">
+                <span id="progreso-preguntas">Pregunta 1 de X</span>
+                <span id="cronometro">00:00</span>
+            </div>
+
+            <div id="zona-pregunta">
+                <h3 id="enunciado">Aquí irá el enunciado de la pregunta</h3>
+                <div id="opciones">
+                </div>
+            </div>
+
+            <div id="feedback" class="id-oculto"></div>
+
+            <button id="btn-siguiente" class="btn-secundario">Saltar / Siguiente Pregunta</button>
+        </div>
+
+        <div id="pantalla-resumen" class="id-oculto">
+            <h2>Resultados del Examen</h2>
+            <div class="contenedor-grafico">
+                <div id="grafico-circular"></div>
+            </div>
+
+            <div class="marcador-notas">
+                <div class="nota-final">Nota: <span id="txt-nota">0.0</span></div>
+                <div class="detalles-contadores">
+                    <p class="txt-acierto">Aciertos: <span id="txt-aciertos">0</span></p>
+                    <p class="txt-fallo">Fallos: <span id="txt-fallos">0</span></p>
+                    <p class="txt-blanco">No contestadas: <span id="txt-blancos">0</span></p>
+                </div>
+            </div>
+
+            <div class="grupo-dato">
+                <span>Tiempo invertido:</span>
+                <span id="txt-tiempo-total">00:00</span>
+            </div>
+
+            <button id="btn-reiniciar" class="btn-principal">Volver al Menú</button>
+            <div class="contenedor-historial">
+                <h3>Historial de Intentos</h3>
+                <table id="tabla-historial">
+                    <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Nota</th>
+                        <th>Tiempo</th>
+                    </tr>
+                    </thead>
+                    <tbody id="cuerpo-historial">
+                    <!-- Aquí se insertarán las filas solas -->
+                    </tbody>
+                </table>
+                </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
