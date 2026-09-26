@@ -13,7 +13,11 @@ const grupoTema = document.getElementById('grupo-tema');
 // ==========================================================================
 // 2. VARIABLES DE ESTADO (La memoria temporal del test)
 // ==========================================================================
-let bancoPreguntasCompleto = []; // Aquí guardaremos TODAS las preguntas del JSON
+let bancoPreguntasCompleto = []; // Aquí guardaremos TODAS las preguntas de la bd
+let preguntasTest = [];
+let indicePreguntaActual = 0;
+let puntuacion = 0;
+let respuestasUsuario = []; // Guardará las respuestas dadas para poder volver atrás
 
 // ==========================================================================
 // 3. CARGAR LOS DATOS (Leer el archivo preguntas.json)
@@ -48,7 +52,6 @@ const pantallaTest = document.getElementById('pantalla-test');
 
 // Variables para controlar el test por dentro
 let preguntasFiltradas = []; // Las preguntas que entran en ESTE examen
-let indicePreguntaActual = 0; // Por qué pregunta va el usuario (0 es la primera)
 let tiempoSegundos = 0; // Guardará el total de segundos transcurridos
 let idCronometro;       // Guardará el "mando a distancia" para poder parar el reloj
 const cronometroElemento = document.getElementById('cronometro'); // Capturamos el <span> del HTML
@@ -221,6 +224,14 @@ function mostrarPreguntaEnPantalla() {
     // Limpiamos el feedback visual del clic anterior
     const divFeedback = document.getElementById('feedback');
     const btnSiguiente = document.getElementById('btn-siguiente');
+    const btnAnterior = document.getElementById('btn-anterior');
+    if (btnAnterior) {
+        if (indicePreguntaActual === 0) {
+            btnAnterior.classList.add('id-oculto');
+        } else {
+            btnAnterior.classList.remove('id-oculto');
+        }
+    }
     divFeedback.classList.add('id-oculto');
     divFeedback.innerHTML = "";
     
@@ -247,10 +258,14 @@ function mostrarPreguntaEnPantalla() {
         { texto: preguntaActual.opcion_3, esCorrecta: preguntaActual.correcta == 3 }
     ];
 
-    opcionesEstructuradas = barajarArray(opcionesEstructuradas);
+    // Si la pregunta ya tiene sus opciones barajadas de antes, mantenemos ese orden exacto
+    if (!preguntaActual.opcionesGuardadas) {
+        preguntaActual.opcionesGuardadas = barajarArray(opcionesEstructuradas);
+    }
+    let opcionesAMostrar = preguntaActual.opcionesGuardadas;
 
     // Recorremos los textos y fabricamos un botón HTML real para cada uno
-    opcionesEstructuradas.forEach((opcion, indiceOpcion) => {
+    opcionesAMostrar.forEach((opcion, indiceOpcion) => {
         const boton = document.createElement('button');
         boton.className = 'btn-opcion'; // Le damos la clase CSS para que se vea bonito
         boton.textContent = opcion.texto;
@@ -268,6 +283,10 @@ function mostrarPreguntaEnPantalla() {
 
         contenedorOpciones.appendChild(boton);
     });
+    // Si esta pregunta ya había sido respondida previamente, restauramos la vista
+    if (respuestasUsuario[indicePreguntaActual] !== undefined) {
+        verificarRespuestaUsuario(respuestasUsuario[indicePreguntaActual]);
+    }
 }
 
 // ==========================================================================
@@ -276,6 +295,8 @@ function mostrarPreguntaEnPantalla() {
 let respuestasDelExamen = []; // Aquí guardaremos el historial para el repaso final
 
 function verificarRespuestaUsuario(indiceSeleccionado) {
+  // Guardamos la respuesta del alumno para esta pregunta
+    respuestasUsuario[indicePreguntaActual] = indiceSeleccionado;
     const preguntaActual = preguntasFiltradas[indicePreguntaActual];
     const divFeedback = document.getElementById('feedback');
     const btnSiguiente = document.getElementById('btn-siguiente');
@@ -339,6 +360,19 @@ btnSiguiente.addEventListener('click', function() {
         finalizarTest();
     }
 });
+
+// ==========================================
+// 9.1 CONTROL DEL BOTÓN PREGUNTA ANTERIOR
+// ==========================================
+const btnAnteriorAccion = document.getElementById('btn-anterior');
+if (btnAnteriorAccion) {
+    btnAnteriorAccion.addEventListener('click', function() {
+        if (indicePreguntaActual > 0) {
+            indicePreguntaActual--;
+            mostrarPreguntaEnPantalla();
+        }
+    });
+}
 
 // ==========================================================================
 // 10. FUNCIÓN PARA FINALIZAR EL TEST Y MOSTRAR RESULTADOS
