@@ -452,20 +452,20 @@ function barajarArray(array) {
 // ==========================================
 
 function guardarEnHistorial(nota, tiempoTexto) {
-  const modo = selectModo.value;
-  const tema = selectTema.value;
-  const tipoExamen = modo === 'tema' ? `Tema ${tema}` : 'Global';
+  const nombreAsignatura = selectAsignatura.options[selectAsignatura.selectedIndex]?.text || 'General';
+  const temaTexto = selectTema.value ? `Tema ${selectTema.value}` : 'Todos';
 
-  const fecha = new Date().toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const ahora = new Date();
+  const dia = String(ahora.getDate()).padStart(2, '0');
+  const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+  const horas = String(ahora.getHours()).padStart(2, '0');
+  const minutos = String(ahora.getMinutes()).padStart(2, '0');
+  const fecha = `${dia}/${mes} ${horas}:${minutos}`;
 
   const nuevoRegistro = {
     fecha: fecha,
-    tipo: tipoExamen,
+    asignatura: nombreAsignatura,
+    tema: temaTexto,
     nota: nota,
     tiempo: tiempoTexto
   };
@@ -482,14 +482,15 @@ function pintarHistorial() {
   const historial = JSON.parse(localStorage.getItem('historial_tests')) || [];
 
   if (historial.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" style="color: #888;">Sin intentos registrados aún</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="color: #888; text-align: center;">Sin intentos registrados aún</td></tr>';
     return;
   }
 
   tbody.innerHTML = historial.map(item => `
     <tr>
       <td>${item.fecha}</td>
-      <td>${item.tipo}</td>
+      <td>${item.asignatura || '-'}</td>
+      <td>${item.tema || item.tipo || '-'}</td>
       <td><strong>${item.nota}</strong></td>
       <td>${item.tiempo}</td>
     </tr>
