@@ -94,12 +94,9 @@ selectAsignatura.addEventListener('change', async (e) => {
 
   selectTema.innerHTML = '<option value="">Cargando temas...</option>';
 
-  // Pedimos solo la columna "tema" de las preguntas de esa asignatura
-  const { data: preguntas, error } = await supabaseClient
-    .from('preguntas')
-    .select('tema')
-    .eq('asignatura_id', asignaturaId);
-
+  // Pedimos solo la lista de temas mediante la función segura
+    const { data: preguntas, error } = await supabaseClient
+        .rpc('obtener_temas_asignatura', { p_asignatura_id: parseInt(asignaturaId) });
   if (error) {
     console.error('Error al cargar temas:', error);
     selectTema.innerHTML = '<option value="">Error al cargar temas</option>';
@@ -149,36 +146,32 @@ btnComenzar.addEventListener('click', async function() {
   btnComenzar.disabled = true;
   btnComenzar.textContent = 'Cargando preguntas...';
 
-  // 3. Preparar la consulta a Supabase
-  let consulta = supabaseClient
-    .from('preguntas')
-    .select('*')
-    .eq('asignatura_id', asignaturaElegida);
+  // 3. Preparar los parámetros y pedir las preguntas ya barajadas
+    const limite = 10;
+    const temaFiltrado = (temaElegido && temaElegido !== 'todos') ? parseInt(temaElegido) : null;
 
-  // Si eligió modo tema, añadimos el filtro correspondiente
-  consulta = consulta.eq('tema', parseInt(temaElegido));
+    const { data: preguntas, error } = await supabaseClient
+      .rpc('obtener_preguntas_test', {
+        p_asignatura_id: parseInt(asignaturaElegida),
+        p_tema: temaFiltrado,
+        p_limite: limite
+      });
 
-  const { data: preguntas, error } = await consulta;
+    btnComenzar.disabled = false;
+    btnComenzar.textContent = 'Comenzar Test';
 
-  btnComenzar.disabled = false;
-  btnComenzar.textContent = 'Comenzar Test';
-
-  if (error || !preguntas || preguntas.length === 0) {
-    console.error('Error al cargar preguntas:', error);
-    if (msgError) {
-      msgError.textContent = '⚠️ No se encontraron preguntas para la selección indicada.';
-      msgError.classList.remove('id-oculto');
+    if (error || !preguntas || preguntas.length === 0) {
+      console.error('Error al cargar preguntas:', error);
+      if (msgError) {
+        msgError.textContent = '⚠️ No se encontraron preguntas para la selección indicada.';
+        msgError.classList.remove('id-oculto');
+      }
+      return;
     }
-    return;
-  }
 
-  // 4. Barajar las preguntas al azar
-  const barajadas = [...preguntas].sort(() => 0.5 - Math.random());
-
-  // 5. Cortar la cantidad según el modo (10 para tema, 40 para examen global)
-  const limite = 10;
-  preguntasFiltradas = barajadas.slice(0, Math.min(limite, barajadas.length));
-
+    // 4. Asignamos las preguntas (la base de datos ya las devuelve barajadas y cortadas a 10)
+    preguntasFiltradas = preguntas;
+    
   // 6. Resetear variables de control
   indicePreguntaActual = 0;
 
